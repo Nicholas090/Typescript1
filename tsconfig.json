@@ -1,28 +1,20 @@
- {
-   "compilerOptions": {
-    "allowJs": true,
-    "allowSyntheticDefaultImports": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "inlineSources": true,
-    "jsx": "react",
-    "lib": [
-      "dom","es2018", "esnext"
-    ],
-    "module": "commonjs",
-    "noImplicitAny": true,
-    "noImplicitThis": true,
-    "noImplicitReturns": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "moduleResolution": "node",
-    "outDir": "./built",
-    "preserveConstEnums": true,
-    "resolveJsonModule": true,
-    "sourceMap": true,
-    "strict": true,
-    "strictNullChecks": true,
-    "target": "es2018",
-    "sourceRoot": "/"
-  }
+{
+  "compilerOptions": {
+        
+    "target": "es2018",                           
+    "module": "commonjs",                    
+    "strict": true,                              
+    "esModuleInterop": true,                       
+    "skipLibCheck": true,                          
+    "forceConsistentCasingInFileNames": true,
+    "types": []     
+  },
+  "files" : [
+    "src/js/main.ts",
+    "src/js/modules/tabs/tabs.ts",
+    "src/js/modules/modal.ts/",
+    "src/js/modules/forms/forms.ts",
+     "src/js/modules/changeState/changeState.ts",
+     "src/js/modules/timer/timer.ts"
+  ]
 }

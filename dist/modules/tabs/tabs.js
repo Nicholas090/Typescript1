@@ -12,9 +12,7 @@ const tabs = (headerSelector, tabSelector, contentSelector, activeClass) => {
     }
     function ShowTabContent(i) {
         content[i].style.display = 'block';
-        tab[i].querySelectorAll('active_a').forEach(i => {
-            i.classList.add(activeClass);
-        });
+        tab[i].classList.add(activeClass);
     }
     HideTabContent();
     ShowTabContent(0);

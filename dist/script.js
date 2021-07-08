@@ -14010,19 +14010,135 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 "use strict";
 
 
-exports.__esModule = true;
+var __importDefault = this && this.__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 __webpack_require__(/*! ./slider */ "./src/js/slider.js");
 
-var modal_1 = __webpack_require__(/*! ./modules/modal */ "./src/js/modules/modal.js");
+const modal_1 = __importDefault(__webpack_require__(/*! ./modules/modal */ "./src/js/modules/modal.js"));
 
-var tabs_1 = __webpack_require__(/*! ./modules/tabs/tabs */ "./src/js/modules/tabs/tabs.js");
+const tabs_1 = __importDefault(__webpack_require__(/*! ./modules/tabs/tabs */ "./src/js/modules/tabs/tabs.js"));
 
-window.addEventListener('DOMContentLoaded', function () {
-  modal_1["default"]();
-  tabs_1["default"]('.glazing_slider', '.glazing_block', '.glazing_content', 'active');
-  tabs_1["default"]('.decoration_slider', '.no_click', '.decoration_content > div > div', 'after_click');
+const forms_1 = __importDefault(__webpack_require__(/*! ./modules/forms/forms */ "./src/js/modules/forms/forms.js"));
+
+const changeState_1 = __importDefault(__webpack_require__(/*! ./modules/changeState/changeState */ "./src/js/modules/changeState/changeState.js"));
+
+const timer_1 = __importDefault(__webpack_require__(/*! ./modules/timer/timer */ "./src/js/modules/timer/timer.js"));
+
+window.addEventListener('DOMContentLoaded', () => {
+  let modalState = {};
+  let deadline = '2021-09-3';
+  changeState_1.default(modalState);
+  modal_1.default();
+  tabs_1.default('.glazing_slider', '.glazing_block', '.glazing_content', 'active');
+  tabs_1.default('.decoration_slider', '.no_click', '.decoration_content > div > div', 'after_click');
+  tabs_1.default('.balcon_icons', '.balcon_icons_img', '.big_img > img', 'do_image_more', 'inline-block');
+  forms_1.default();
+  timer_1.default('.container1', deadline);
 });
+
+/***/ }),
+
+/***/ "./src/js/modules/changeState/changeState.js":
+/*!***************************************************!*\
+  !*** ./src/js/modules/changeState/changeState.js ***!
+  \***************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+const changeModalState = state => {
+  const windowForm = document.querySelectorAll('.balcon_icons_img'),
+        windowWidth = document.querySelector('#width'),
+        windowHeight = document.querySelector('#height'),
+        windowType = document.querySelector('#view_type'),
+        windowProfile = document.querySelectorAll('.checkbox');
+  windowForm.forEach((item, index) => {
+    item.addEventListener('click', () => {
+      state.form = index;
+      console.log(typeof state);
+    });
+  });
+};
+
+exports.default = changeModalState;
+
+/***/ }),
+
+/***/ "./src/js/modules/forms/forms.js":
+/*!***************************************!*\
+  !*** ./src/js/modules/forms/forms.js ***!
+  \***************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+const forms = () => {
+  const form = document.querySelectorAll('form'),
+        input = document.querySelectorAll('input');
+  const message = {
+    loading: 'Загрузка',
+    failure: 'Что-то пошло не так...',
+    succses: 'Успешно =)'
+  };
+
+  const postData = async (url, data) => {
+    document.querySelector('.status').textContent = message.loading;
+    let res = await fetch(url, {
+      method: "POST",
+      body: data
+    });
+    return await res.text();
+  };
+
+  const clearInputs = () => {
+    input.forEach(item => {
+      item.value = '';
+    });
+  };
+
+  form.forEach(item => {
+    item.addEventListener('submit', e => {
+      e.preventDefault();
+      let statusMessage = document.createElement('div');
+      statusMessage.classList.add('status');
+      item.appendChild(statusMessage);
+      const formData = new FormData(item);
+      postData('assets/server.php', formData).then(result => {
+        console.log(result);
+        statusMessage.textContent = message.succses;
+      }).catch(() => {
+        statusMessage.textContent = message.failure;
+      }).finally(() => {
+        clearInputs();
+        setTimeout(() => {
+          statusMessage.remove();
+        }, 5000);
+      });
+    });
+  });
+};
+
+exports.default = forms;
 
 /***/ }),
 
@@ -14036,34 +14152,43 @@ window.addEventListener('DOMContentLoaded', function () {
 "use strict";
 
 
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-var modals = function modals() {
-  function bindModal(triggerSelector, modalSelector, closeSelector) {
-    var trigger = document.querySelectorAll(triggerSelector),
-        modal = document.querySelector(modalSelector),
-        close = document.querySelector(closeSelector);
-    trigger.forEach(function (item) {
-      item.addEventListener('click', function (e) {
+const modals = () => {
+  function bindModal(triggerSelector, modalSelector, closeSelector, closeClickOverlay = true) {
+    const trigger = document.querySelectorAll(triggerSelector),
+          modal = document.querySelector(modalSelector),
+          close = document.querySelector(closeSelector),
+          win = document.querySelectorAll('[data-modal]');
+    trigger.forEach(item => {
+      item.addEventListener('click', e => {
         if (e.target) {
           e.preventDefault();
         }
 
+        win.forEach(i => {
+          i.style.display = 'none';
+        });
         modal.style.display = 'block';
         document.body.style.overflow = 'hidden';
       });
     });
-    close.addEventListener('click', function () {
+    close.addEventListener('click', () => {
       modal.style.display = 'none';
       document.body.style.overflow = '';
+      win.forEach(i => {
+        i.style.display = 'none';
+      });
     });
-    window.addEventListener('click', function (e) {
-      if (e.target == modal) {
+    window.addEventListener('click', e => {
+      if (e.target == modal && closeClickOverlay) {
         modal.style.display = 'none';
         document.body.style.overflow = '';
       }
     });
-    window.addEventListener('keydown', function (e) {
+    window.addEventListener('keydown', e => {
       if (e.code === 'Escape') {
         modal.style.display = 'none';
         document.body.style.overflow = '';
@@ -14072,19 +14197,21 @@ var modals = function modals() {
   }
 
   function modalTimer(selector, time) {
-    setTimeout(function () {
+    setTimeout(() => {
       document.querySelector(selector).style.display = 'block';
       document.body.style.overflow = 'hidden';
     }, time);
   }
 
   ;
+  bindModal('.popup_calc_btn', '.popup_calc', '.popup_calc_close');
   bindModal('.popup_engineer_btn', '.popup_engineer', '.popup_engineer .popup_close');
   bindModal('.phone_link', '.popup', '.popup .popup_close');
-  modalTimer('.popup', 3000);
+  bindModal('.popup_calc_button', '.popup_calc_profile', '.popup_calc_profile_close', false);
+  bindModal('.popup_calc_profile_button', '.popup_calc_end', '.popup_calc_end_close', false); // modalTimer('.popup', 300000);
 };
 
-exports["default"] = modals;
+exports.default = modals;
 
 /***/ }),
 
@@ -14098,35 +14225,37 @@ exports["default"] = modals;
 "use strict";
 
 
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-var tabs = function tabs(headerSelector, tabSelector, contentSelector, activeClass) {
-  var header = document.querySelector(headerSelector),
-      tab = document.querySelectorAll(tabSelector),
-      content = document.querySelectorAll(contentSelector);
+const tabs = (headerSelector, tabSelector, contentSelector, activeClass, display = 'block') => {
+  const header = document.querySelector(headerSelector),
+        tab = document.querySelectorAll(tabSelector),
+        content = document.querySelectorAll(contentSelector);
 
   function HideTabContent() {
-    content.forEach(function (item) {
+    content.forEach(item => {
       item.style.display = 'none';
     });
-    tab.forEach(function (item) {
+    tab.forEach(item => {
       item.classList.remove(activeClass);
     });
   }
 
   function ShowTabContent(i) {
-    content[i].style.display = 'block';
+    content[i].style.display = display;
     tab[i].classList.add(activeClass);
   }
 
   HideTabContent();
   ShowTabContent(0);
-  header.addEventListener('click', function (event) {
-    var target = event.target; // let reg: RegExp = /\./;
+  header.addEventListener('click', event => {
+    const target = event.target; // let reg: RegExp = /\./;
     // let rep: string = tabSelector.replace(reg, "");
 
     if (target) {
-      tab.forEach(function (item, i) {
+      tab.forEach((item, i) => {
         if (target == item || target.parentNode == item) {
           HideTabContent();
           ShowTabContent(i);
@@ -14138,7 +14267,78 @@ var tabs = function tabs(headerSelector, tabSelector, contentSelector, activeCla
   });
 };
 
-exports["default"] = tabs;
+exports.default = tabs;
+
+/***/ }),
+
+/***/ "./src/js/modules/timer/timer.js":
+/*!***************************************!*\
+  !*** ./src/js/modules/timer/timer.js ***!
+  \***************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+const timer = (id, deadline) => {
+  const getTimeRemaninig = endtme => {
+    const t = Date.parse(endtme) - Date.parse(new Date().toLocaleString()),
+          seconds = Math.floor(t / 1000 % 60),
+          minutes = Math.floor(t / 1000 / 60 % 60),
+          hours = Math.floor(t / (1000 * 60 * 60) % 24),
+          days = Math.floor(t / (1000 * 60 * 60 * 24));
+    return {
+      'total': t,
+      'days': days,
+      'hours': hours,
+      'minutes': minutes,
+      'seconds': seconds
+    };
+  };
+
+  const addZero = num => {
+    if (num < 10) {
+      return '0' + num;
+    } else {
+      return num;
+    }
+  };
+
+  const setClock = (selector, endtime) => {
+    const timer = document.querySelector(selector),
+          days = timer.querySelector('#days'),
+          hours = timer.querySelector('#hours'),
+          minutes = timer.querySelector('#minutes'),
+          seconds = timer.querySelector('#seconds'),
+          timerInterval = setInterval(updateClock, 1000);
+    updateClock();
+
+    function updateClock() {
+      const t = getTimeRemaninig(endtime);
+      days.textContent = String(addZero(t.days));
+      hours.textContent = String(addZero(t.hours));
+      minutes.textContent = String(addZero(t.minutes));
+      seconds.textContent = String(addZero(t.seconds));
+
+      if (t.total <= 0) {
+        days.textContent = '00';
+        hours.textContent = '00';
+        minutes.textContent = '00';
+        seconds.textContent = '00';
+        clearInterval(timerInterval);
+      }
+    }
+  };
+
+  setClock(id, deadline);
+};
+
+exports.default = timer;
 
 /***/ }),
 

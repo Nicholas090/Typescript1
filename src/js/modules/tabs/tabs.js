@@ -1,27 +1,27 @@
 "use strict";
-exports.__esModule = true;
-var tabs = function (headerSelector, tabSelector, contentSelector, activeClass) {
-    var header = document.querySelector(headerSelector), tab = document.querySelectorAll(tabSelector), content = document.querySelectorAll(contentSelector);
+Object.defineProperty(exports, "__esModule", { value: true });
+const tabs = (headerSelector, tabSelector, contentSelector, activeClass, display = 'block') => {
+    const header = document.querySelector(headerSelector), tab = document.querySelectorAll(tabSelector), content = document.querySelectorAll(contentSelector);
     function HideTabContent() {
-        content.forEach(function (item) {
+        content.forEach(item => {
             item.style.display = 'none';
         });
-        tab.forEach(function (item) {
+        tab.forEach(item => {
             item.classList.remove(activeClass);
         });
     }
     function ShowTabContent(i) {
-        content[i].style.display = 'block';
+        content[i].style.display = display;
         tab[i].classList.add(activeClass);
     }
     HideTabContent();
     ShowTabContent(0);
-    header.addEventListener('click', function (event) {
-        var target = event.target;
+    header.addEventListener('click', (event) => {
+        const target = event.target;
         // let reg: RegExp = /\./;
         // let rep: string = tabSelector.replace(reg, "");
         if (target) {
-            tab.forEach(function (item, i) {
+            tab.forEach((item, i) => {
                 if (target == item || target.parentNode == item) {
                     HideTabContent();
                     ShowTabContent(i);
@@ -34,4 +34,4 @@ var tabs = function (headerSelector, tabSelector, contentSelector, activeClass) 
         }
     });
 };
-exports["default"] = tabs;
+exports.default = tabs;
